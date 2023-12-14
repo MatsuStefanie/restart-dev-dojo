@@ -2,6 +2,7 @@ package com.matsu.springrestart.repository;
 
 import com.matsu.springrestart.domain.Anime;
 
+import com.matsu.springrestart.util.AnimeCreator;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -22,11 +23,13 @@ class AnimeRepositoryTest {
     @Autowired
     private AnimeRepository animeRepository;
 
+
+
     @Test
     @DisplayName("Successful persist anime")
     void save_persist_anime_when_successful() {
 
-        Anime anime = createAnime();
+        Anime anime = AnimeCreator.createAnimeToBeSaved();
         Anime savedAnime = this.animeRepository.save(anime);
 
         assertNotNull(savedAnime);
@@ -38,7 +41,7 @@ class AnimeRepositoryTest {
     @DisplayName("Successful updates anime")
     void save_updates_anime_when_successful() {
 
-        Anime anime = createAnime();
+        Anime anime = AnimeCreator.createAnimeToBeSaved();
         Anime savedAnime = this.animeRepository.save(anime);
         log.info("Anime created id: {} name: {}", savedAnime.getId(), savedAnime.getName());
 
@@ -56,7 +59,7 @@ class AnimeRepositoryTest {
     @DisplayName("Successful remove anime")
     void delete_remove_anime_when_successful() {
 
-        Anime anime = createAnime();
+        Anime anime = AnimeCreator.createAnimeToBeSaved();
         Anime savedAnime = this.animeRepository.save(anime);
 
         this.animeRepository.delete(savedAnime);
@@ -70,7 +73,7 @@ class AnimeRepositoryTest {
     @DisplayName("Successful find by name anime")
     void find_by_name_return_list_of_anime_when_successful() {
 
-        Anime anime = createAnime();
+        Anime anime = AnimeCreator.createAnimeToBeSaved();
         Anime savedAnime = this.animeRepository.save(anime);
 
         List<Anime> animeList = this.animeRepository.findByName(savedAnime.getName());
@@ -83,7 +86,7 @@ class AnimeRepositoryTest {
     @DisplayName("Not found by name anime and return list empty")
     void find_by_name_return_empty_list_of_anime_when_not_found() {
 
-        Anime anime = createAnime();
+        Anime anime = AnimeCreator.createAnimeToBeSaved();
         this.animeRepository.save(anime);
         String wrongName = "Sailor moon";
 
@@ -104,11 +107,5 @@ class AnimeRepositoryTest {
         assertThrowsExactly(ConstraintViolationException.class,
                 ()->this.animeRepository.save(anime));
 
-    }
-
-    private Anime createAnime(){
-        return Anime.builder()
-                .name("Promise never land")
-                .build();
     }
 }
