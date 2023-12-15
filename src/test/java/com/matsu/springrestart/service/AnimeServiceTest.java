@@ -1,6 +1,7 @@
 package com.matsu.springrestart.service;
 
 import com.matsu.springrestart.domain.Anime;
+import com.matsu.springrestart.exception.BadRequestException;
 import com.matsu.springrestart.repository.AnimeRepository;
 import com.matsu.springrestart.util.AnimeCreator;
 import com.matsu.springrestart.util.AnimePostRequestBodyCreator;
@@ -24,8 +25,11 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -87,6 +91,18 @@ class AnimeServiceTest {
     }
 
     @Test
+    @DisplayName("Failed get anime by id")
+    void return_anime_by_id_failed() {
+
+        when(animeRepository
+                .findById(ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.empty());
+
+        assertThrows(BadRequestException.class, () -> animeService.findByIdOrThrowBadRequest(anyLong()));
+        verify(animeRepository).findById(anyLong());
+    }
+
+    @Test
     @DisplayName("Successful get anime by name")
     void return_anime_by_name_successful() {
 
@@ -133,8 +149,12 @@ class AnimeServiceTest {
     @Test
     @DisplayName("Successful updated anime")
     void updated_anime_successful() {
+        when(animeRepository
+                .findById(ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.of(AnimeCreator.createValidAnime()));
 
-        //assertDoesNotThrow(() -> animeService.replace(AnimePutRequestBodyCreator.createAnimeToBeUpdated()));
+        assertDoesNotThrow(() -> animeService.replace(AnimePutRequestBodyCreator.createAnimeToBeUpdated()));
+        verify(animeRepository).save(ArgumentMatchers.any(Anime.class));
     }
 
     @Test
@@ -142,8 +162,11 @@ class AnimeServiceTest {
     void deleted_anime_successful() {
         doNothing().when(animeRepository)
                 .delete(ArgumentMatchers.any(Anime.class));
+        when(animeRepository
+                .findById(ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.of(AnimeCreator.createValidAnime()));
 
-
-        //assertDoesNotThrow(() -> animeService.delete(1L));
+        assertDoesNotThrow(() -> animeService.delete(1L));
+        verify(animeRepository).delete(ArgumentMatchers.any(Anime.class));
     }
 }

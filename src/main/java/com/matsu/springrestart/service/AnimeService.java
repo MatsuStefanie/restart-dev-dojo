@@ -44,7 +44,8 @@ public class AnimeService {
     }
 
     public void delete(Long id) {
-        animeRepository.delete(findByIdOrThrowBadRequest(id));
+        Anime anime = findByIdOrThrowBadRequest(id);
+        animeRepository.delete(anime);
     }
 
     public void replace(AnimePutRequestBody anime) {
