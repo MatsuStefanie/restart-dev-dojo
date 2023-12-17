@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ class AnimeControllerIT {
         Anime anime = repository.save(AnimeCreator.createAnimeToBeSaved());
         String expectedName = anime.getName();
 
-        PageableResponse<Anime> animePage = template.exchange(
+        Page<Anime> animePage = template.exchange(
                         "/animes",
                         HttpMethod.GET,
                         null,
