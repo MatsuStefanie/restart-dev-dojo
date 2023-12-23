@@ -5,6 +5,7 @@ import com.matsu.springrestart.exception.BadRequestExceptionDetails;
 import com.matsu.springrestart.exception.ExceptionDetails;
 import com.matsu.springrestart.exception.ValidationExceptionDetails;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -67,7 +69,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(
-            Exception ex,
+            @NotNull Exception ex,
             @Nullable Object body,
             HttpHeaders headers,
             HttpStatusCode statusCode,
@@ -83,11 +85,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 return null;
             }
         }
+        var title = Optional.of(ex).map(Throwable::getCause).map(Throwable::getMessage).orElse("Cause undefined");
 
         ExceptionDetails exceptionDetails = ExceptionDetails.builder()
                 .timestamp(LocalDateTime.now())
                 .status(statusCode.value())
-                .title(ex.getCause().getMessage())
+                .title(title)
                 .details(ex.getMessage())
                 .developerMessage(ex.getClass().getName())
                 .build();

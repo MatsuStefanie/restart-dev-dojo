@@ -14,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -48,6 +50,14 @@ public class AnimeController {
         return ResponseEntity.ok(animeService.findByIdOrThrowBadRequest(id));
     }
 
+    @GetMapping(path = "/auth/{id}")
+    public ResponseEntity<Anime> findByIdAuthenticationPrincipal(@PathVariable long id,
+                                                                 @AuthenticationPrincipal UserDetails userDetails) {
+        log.info("The {} request a anime in base at {}", userDetails.getUsername(),
+                dateUtil.formatLocalDatetimeToDatabaseStyle(LocalDateTime.now()));
+        return ResponseEntity.ok(animeService.findByIdOrThrowBadRequest(id));
+    }
+
     @GetMapping(path = "/find")
     public ResponseEntity<List<Anime>> findByName(@RequestParam String name) {
         log.info("Request a specific anime in base at {}",
@@ -64,6 +74,7 @@ public class AnimeController {
     }
 
     @DeleteMapping(path = "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable long id) {
         log.info("Remove a anime in base at {}",
                 dateUtil.formatLocalDatetimeToDatabaseStyle(LocalDateTime.now()));
