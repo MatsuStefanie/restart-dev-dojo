@@ -13,10 +13,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,6 +43,7 @@ public class AnimeController {
                 dateUtil.formatLocalDatetimeToDatabaseStyle(LocalDateTime.now()));
         return ResponseEntity.ok(animeService.listAll(pageable));
     }
+
     @GetMapping(path = "/all")
     public ResponseEntity<List<Anime>> listAll() {
         log.info("Request all animes in base at {}",
@@ -65,16 +73,14 @@ public class AnimeController {
         return ResponseEntity.ok(animeService.findByName(name));
     }
 
-    @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping(path = "/auth")
     public ResponseEntity<Anime> save(@RequestBody @Valid AnimePostRequestBody anime) {
         log.info("Add a new anime in base at {}",
                 dateUtil.formatLocalDatetimeToDatabaseStyle(LocalDateTime.now()));
         return new ResponseEntity<>(animeService.save(anime), HttpStatus.CREATED);
     }
 
-    @DeleteMapping(path = "/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping(path = "/auth/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id) {
         log.info("Remove a anime in base at {}",
                 dateUtil.formatLocalDatetimeToDatabaseStyle(LocalDateTime.now()));
@@ -82,7 +88,7 @@ public class AnimeController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping
+    @PutMapping(path = "/auth")
     public ResponseEntity<Void> replace(@RequestBody AnimePutRequestBody anime) {
         log.info("Rename a anime in base at {}",
                 dateUtil.formatLocalDatetimeToDatabaseStyle(LocalDateTime.now()));

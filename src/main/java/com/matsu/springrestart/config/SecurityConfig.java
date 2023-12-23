@@ -1,7 +1,6 @@
 package com.matsu.springrestart.config;
 
 import com.matsu.springrestart.service.CustomerDetailsService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,7 +14,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-@Slf4j
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -28,6 +26,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("*/auth/**").hasRole("ADMIN")
+                        .requestMatchers("animes/**").hasRole("USER")
                         .anyRequest()
                         .authenticated()
                 )
@@ -41,6 +41,7 @@ public class SecurityConfig {
                                              HttpSecurity httpSecurity) throws Exception {
 
         PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+
         AuthenticationManagerBuilder builderAuthentication = httpSecurity
                 .getSharedObject(AuthenticationManagerBuilder.class);
 
