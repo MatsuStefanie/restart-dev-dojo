@@ -6,9 +6,13 @@ import com.matsu.springrestart.requests.AnimePostRequestBody;
 import com.matsu.springrestart.requests.AnimePutRequestBody;
 import com.matsu.springrestart.service.AnimeService;
 import com.matsu.springrestart.util.DateUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -30,15 +34,18 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("animes")
 @RequiredArgsConstructor
+@RequestMapping("animes")
 public class AnimeController {
 
     private final DateUtil dateUtil;
     private final AnimeService animeService;
 
     @GetMapping
-    public ResponseEntity<Page<Anime>> list(Pageable pageable) {
+    @Operation(summary = "List all anime paginated",
+            description = "The default size is 20, use the parameter siza to change the default value",
+            tags = {"Anime"})
+    public ResponseEntity<Page<Anime>> list(@ParameterObject Pageable pageable) {
         log.info("Request all animes in base at {}",
                 dateUtil.formatLocalDatetimeToDatabaseStyle(LocalDateTime.now()));
         return ResponseEntity.ok(animeService.listAll(pageable));
@@ -81,6 +88,10 @@ public class AnimeController {
     }
 
     @DeleteMapping(path = "/auth/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Successful Operation"),
+            @ApiResponse(responseCode = "400", description = "When anime does not exist in the database")
+    })
     public ResponseEntity<Void> delete(@PathVariable long id) {
         log.info("Remove a anime in base at {}",
                 dateUtil.formatLocalDatetimeToDatabaseStyle(LocalDateTime.now()));

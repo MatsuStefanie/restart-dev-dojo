@@ -10,3 +10,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+info:
+  app: Spring boot upgrade 2 para 3
+  github: https://github.com/MatsuStefanie/restart-dev-dojo
